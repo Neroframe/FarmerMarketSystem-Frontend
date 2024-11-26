@@ -1,8 +1,8 @@
-// app/farmer/Dashboard.tsx
-
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons'; 
+
 
 const Dashboard: React.FC = () => {
   const router = useRouter();
@@ -18,13 +18,13 @@ const Dashboard: React.FC = () => {
     status: string;
   } | null>(null);
 
-  /**
-   * Fetches authenticated farmer's data from the backend.
-   */
   const fetchUserData = async () => {
     try {
-      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/dashboard', { // Replace with your backend URL
+      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/dashboard', { 
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         credentials: 'include', // Include session cookie
       });
 
@@ -44,13 +44,10 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  /**
-   * Handles the logout process.
-   */
   const handleLogout = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/logout', { // Replace with your backend URL
+      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/logout', { 
         method: 'POST',
         credentials: 'include', // Include session cookie
       });
@@ -96,27 +93,30 @@ const Dashboard: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome, [{user.id}] {user.first_name} {user.last_name}!</Text>
-      <Text style={styles.infoText}>Email: {user.email}</Text>
-      <Text style={styles.infoText}>Farm Name: {user.farm_name}</Text>
-      <Text style={styles.infoText}>Farm Size: {user.farm_size}</Text>
-      <Text style={styles.infoText}>Location: {user.location}</Text>
-      <Text style={styles.infoText}>Status: {user.status}</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Farmer Dashboard</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
 
 
-      {/* Add more farmer-specific functionalities here */}
-      {/* Example: Manage Products, Track Sales, etc. */}
-      <TouchableOpacity 
+      <View style={styles.user}>
+        <Text style={styles.title}>Welcome, [{user.id}] {user.first_name} {user.last_name}!</Text>
+        <Text style={styles.infoText}>Email: {user.email}</Text>
+        <Text style={styles.infoText}>Farm Name: {user.farm_name}</Text>
+        <Text style={styles.infoText}>Farm Size: {user.farm_size}</Text>
+        <Text style={styles.infoText}>Location: {user.location}</Text>
+        <Text style={styles.infoText}>Status: {user.status}</Text>
+
+        <TouchableOpacity 
         style={styles.button} 
         onPress={() => router.push('/(farmer)/products')}
         disabled={loading}
         >
         <Text style={styles.buttonText}>View Products</Text>
         </TouchableOpacity>
-      {/* Logout Button */}
-      <TouchableOpacity style={styles.button} onPress={handleLogout} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Logout</Text>}
-      </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -127,9 +127,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  user: {
     paddingHorizontal: 30,
     paddingTop: 50,
     alignItems: 'center',
+  },
+  header: {
+    backgroundColor: '#4CAF50',
+    paddingTop: 50, // For status bar padding
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    // Elevation for Android
+    elevation: 3,
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,
@@ -161,7 +184,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#f44336', // Red color for logout
+    backgroundColor: '#f44336', 
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 8,

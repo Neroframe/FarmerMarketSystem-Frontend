@@ -1,5 +1,3 @@
-// app/farmer/products/index.tsx
-
 import React, { useEffect, useState } from 'react';
 import { 
   StyleSheet, 
@@ -12,6 +10,7 @@ import {
   Image 
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons'; 
 
 interface Product {
   id: number;
@@ -28,7 +27,7 @@ interface Product {
   images: string[]; // URLs of images
 }
 
-const BASE_URL = 'https://farmermarketsystem-production.up.railway.app'; // Replace with your backend URL
+const BASE_URL = 'https://farmermarketsystem-production.up.railway.app'; 
 
 const ProductsList: React.FC = () => {
   const router = useRouter();
@@ -36,9 +35,6 @@ const ProductsList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string>('');
 
-  /**
-   * Fetches the list of products from the backend.
-   */
   const fetchProducts = async () => {
     try {
       const response = await fetch(`${BASE_URL}/farmer/product/list-products`, {
@@ -55,7 +51,7 @@ const ProductsList: React.FC = () => {
       }
 
       const data = await response.json();
-      setProducts(data.products);
+      setProducts(data.products || []); // Ensure products is always an array
     } catch (err: any) {
       console.error('Fetch Products Error:', err);
       setError(err.message || 'An unexpected error occurred.');
@@ -65,9 +61,6 @@ const ProductsList: React.FC = () => {
     }
   };
 
-  /**
-   * Handles the logout process.
-   */
   const handleLogout = async () => {
     setLoading(true);
     try {
@@ -82,7 +75,7 @@ const ProductsList: React.FC = () => {
       }
 
       Alert.alert('Success', 'Logged out successfully!');
-      router.replace('/'); // Redirect to Login after logout
+      router.replace('/'); 
     } catch (error: any) {
       console.error('Logout Error:', error);
       Alert.alert('Error', error.message || 'Failed to log out.');
@@ -91,23 +84,14 @@ const ProductsList: React.FC = () => {
     }
   };
 
-  /**
-   * Navigates to the Add Product page.
-   */
   const navigateToAddProduct = () => {
     router.push('/(farmer)/products/add');
   };
 
-  /**
-   * Navigates to the Edit Product page with the selected product's ID.
-   */
   const navigateToEditProduct = (id: number) => {
     router.push(`/(farmer)/products/edit/${id}`);
   };
 
-  /**
-   * Renders each product item in the FlatList.
-   */
   const renderProduct = ({ item }: { item: Product }) => {
     return (
       <TouchableOpacity 
@@ -149,16 +133,14 @@ const ProductsList: React.FC = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Your Products</Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={loading}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
+        <Text style={styles.headerTitle}>Products</Text>
+        <TouchableOpacity style={styles.addButton} onPress={navigateToAddProduct} disabled={loading}>
+        <Text style={styles.addButtonText}>+ Add Product</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-
-      {/* Add Product Button */}
-      <TouchableOpacity style={styles.addButton} onPress={navigateToAddProduct} disabled={loading}>
-        <Text style={styles.addButtonText}>+ Add Product</Text>
-      </TouchableOpacity>
 
       {/* Loading Indicator */}
       {loading && (
@@ -204,14 +186,25 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   header: {
+    backgroundColor: '#4CAF50',
+    paddingTop: 50, // For status bar padding
+    paddingBottom: 15,
+    paddingHorizontal: 20,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    // Elevation for Android
+    elevation: 3,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 20,
+    color: '#fff',
     fontWeight: 'bold',
-    color: '#333',
   },
   logoutButton: {
     backgroundColor: '#f44336',
@@ -224,11 +217,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   addButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#b83027',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
     marginTop: 15,
   },
   addButtonText: {

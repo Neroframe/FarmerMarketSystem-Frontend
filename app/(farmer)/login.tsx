@@ -11,7 +11,6 @@ const Login: React.FC = () => {
   const handleLogin = async () => {
     if (loading) return;
 
-    // Basic validation
     if (email.trim() === '' || password.trim() === '') {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
@@ -20,7 +19,7 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/login', { // Replace with your backend URL
+      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,8 +28,8 @@ const Login: React.FC = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      // Handle HTTP errors
       if (!response.ok) {
+        Alert.alert('Failed', 'Login Failed!');
         const errorData = await response.json();
         throw new Error(errorData.message || 'Login failed.');
       }
@@ -40,7 +39,6 @@ const Login: React.FC = () => {
       if (data.success) {
         Alert.alert('Success', 'Login successful!');
 
-        // Navigate to Farmer Dashboard
         router.replace('/(farmer)/dashboard');
       } else {
         throw new Error(data.message || 'Login failed.');

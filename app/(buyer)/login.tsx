@@ -29,7 +29,7 @@ const BuyerLogin: React.FC = () => {
           const errorData = await response.json();
           errorMessage = errorData.message || errorMessage;
         } catch {
-          // If response is not JSON, retain the default error message
+          errorMessage = "response is not JSON"
         }
         throw new Error(errorMessage);
       }
@@ -60,7 +60,7 @@ const BuyerLogin: React.FC = () => {
   };
 
   const navigateToRegister = () => {
-    router.push('/(buyer)/register'); // Adjust the path if necessary
+    router.push('/(buyer)/register'); 
   };
 
   return (

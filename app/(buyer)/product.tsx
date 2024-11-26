@@ -13,7 +13,7 @@ type Product = {
 };
 
 const ProductDetails: React.FC = () => {
-  const { id } = useLocalSearchParams(); // Updated to useLocalSearchParams
+  const { id } = useLocalSearchParams(); 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 

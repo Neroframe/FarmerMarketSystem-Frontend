@@ -1,5 +1,3 @@
-// app/farmer/products/add.tsx
-
 import React, { useState } from 'react';
 import { 
   StyleSheet, 
@@ -18,7 +16,7 @@ import * as ImagePicker from 'expo-image-picker';
 const CLOUDINARY_UPLOAD_PRESET = 'unsigned_preset'; // Ensure this matches your Cloudinary preset
 const CLOUDINARY_CLOUD_NAME = 'dvnezwrbt'; // Your Cloudinary cloud name
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
-const BASE_URL = 'https://farmermarketsystem-production.up.railway.app'; // Replace with your backend URL
+const BASE_URL = 'https://farmermarketsystem-production.up.railway.app'; 
 
 const AddProduct: React.FC = () => {
   const router = useRouter();
@@ -31,9 +29,6 @@ const AddProduct: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [uploading, setUploading] = useState<boolean>(false);
 
-  /**
-   * Opens the image library for the user to pick images.
-   */
   const pickImages = async () => {
     // Request media library permissions
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -59,9 +54,6 @@ const AddProduct: React.FC = () => {
     }
   };
 
-  /**
-   * Uploads a single image to Cloudinary using Base64 encoding and returns its URL.
-   */
   const uploadImageToCloudinary = async (image: { uri: string, base64: string }): Promise<string> => {
     const formData = new FormData();
     formData.append('file', `data:image/jpeg;base64,${image.base64}`);
@@ -90,9 +82,6 @@ const AddProduct: React.FC = () => {
     }
   };
 
-  /**
-   * Uploads all selected images to Cloudinary and returns their URLs.
-   */
   const uploadImagesToCloudinary = async (): Promise<string[]> => {
     setUploading(true);
     try {
@@ -108,13 +97,10 @@ const AddProduct: React.FC = () => {
     }
   };
 
-  /**
-   * Handles the product addition process.
-   */
+
   const handleAddProduct = async () => {
     if (loading || uploading) return;
 
-    // Basic validation
     if (
       name.trim() === '' ||
       categoryId.trim() === '' ||
@@ -170,7 +156,7 @@ const AddProduct: React.FC = () => {
 
       if (data.success) {
         Alert.alert('Success', 'Product added successfully!');
-        router.replace('/(farmer)/products'); // Redirect to Products list
+        router.replace('/(farmer)/products');
       } else {
         throw new Error(data.message || 'Failed to add product.');
       }

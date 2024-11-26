@@ -1,5 +1,3 @@
-// app/buyer/home.tsx
-
 import React, { useEffect, useState } from 'react';
 import { 
   StyleSheet, 
@@ -12,14 +10,14 @@ import {
   Image 
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons'; // Icon library
+import { Ionicons } from '@expo/vector-icons'; 
 
 type Product = {
   id: number;
   name: string;
   price: number;
   quantity: number;
-  imageUrl: string; // Assuming each product has an image URL
+  images: string[];  
 };
 
 const BuyerHome: React.FC = () => {
@@ -48,28 +46,60 @@ const BuyerHome: React.FC = () => {
     fetchProducts();
   }, []);
 
-  const renderProduct = ({ item }: { item: Product }) => (
-    <TouchableOpacity
-      style={styles.productCard}
-      onPress={() => router.push({ pathname: '/(buyer)/product/[id]', params: { id: item.id.toString() } })}
-    >
-      {item.imageUrl ? (
-        <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
-      ) : (
-        <View style={styles.placeholderImage}>
-          <Ionicons name="image-outline" size={40} color="#ccc" />
+  const renderProduct = ({ item }: { item: Product }) => {
+    const getFirstImageUrl = (images: string[]): string | null => {
+      if (!images || images.length === 0) return null;
+      // Return the first non-empty, trimmed URL
+      for (let image of images) {
+        const trimmedImage = image.trim();
+        if (trimmedImage) {
+          return trimmedImage;
+        }
+      }
+      return null;
+    };
+
+    const firstImageUrl = getFirstImageUrl(item.images);
+
+    return (
+      <TouchableOpacity
+        style={styles.productCard}
+        onPress={() =>
+          router.push({
+            pathname: '/(buyer)/product/[id]',
+            params: { id: item.id.toString() },
+          })
+        }
+        accessibilityLabel={`View details for ${item.name}`}
+        accessibilityRole="button"
+      >
+        {firstImageUrl ? (
+          <Image
+            source={{ uri: firstImageUrl }}
+            style={styles.productImage}
+            resizeMode="cover"
+            onError={() => {
+              // Handle image load error by showing placeholder
+              Alert.alert('Error', `Failed to load image for ${item.name}`);
+            }}
+          />
+        ) : (
+          <View style={styles.placeholderImage}>
+            <Ionicons name="image-outline" size={40} color="#ccc" />
+            <Text style={styles.placeholderText}>No Image Available</Text>
+          </View>
+        )}
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{item.name}</Text>
+          <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+          <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
         </View>
-      )}
-      <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
-        <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   const handleLogout = () => {
-    // Perform any logout logic here (e.g., clearing tokens)
+    // TODO
     router.push('/');
   };
 
@@ -78,7 +108,11 @@ const BuyerHome: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Buyer Home</Text>
-        <TouchableOpacity onPress={handleLogout}>
+        <TouchableOpacity 
+          onPress={handleLogout} 
+          accessibilityLabel="Logout" 
+          accessibilityRole="button"
+        >
           <Ionicons name="log-out-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -96,11 +130,13 @@ const BuyerHome: React.FC = () => {
           renderItem={renderProduct}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No products available at the moment.</Text>
+            </View>
+          }
         />
       )}
-
-      {/* Footer (Optional) */}
-      {/* You can add a footer here if needed */}
     </View>
   );
 };
@@ -173,6 +209,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  placeholderText: {
+    marginTop: 5,
+    fontSize: 12,
+    color: '#999',
+  },
   productInfo: {
     flex: 1,
     padding: 15,
@@ -205,5 +246,13 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#555',
   },
 });

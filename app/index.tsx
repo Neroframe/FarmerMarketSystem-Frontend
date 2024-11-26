@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
-import Button from '../components/Button';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
 const Index: React.FC = () => {
@@ -18,8 +17,13 @@ const Index: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Choose the User</Text>
       <View style={styles.buttonContainer}>
-        <Button label="Buyer" onPress={handleBuyerPress} />
-        <Button label="Farmer" onPress={handleFarmerPress} />
+        <TouchableOpacity style={styles.button} onPress={handleBuyerPress}>
+          <Text style={styles.buttonText}>Buyer</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={handleFarmerPress}>
+          <Text style={styles.buttonText}>Farmer</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -45,5 +49,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '80%',
+  },
+  button: {
+    backgroundColor: '#4CAF50', 
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    alignItems: 'center',
+    flex: 1, 
+    marginHorizontal: 5, 
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

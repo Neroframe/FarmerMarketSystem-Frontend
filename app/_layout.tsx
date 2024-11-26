@@ -1,10 +1,8 @@
 import { Stack } from 'expo-router';
 import React from 'react';
-import { AuthProvider } from '../contexts/AuthContext';
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
       <Stack>
         <Stack.Screen name="index" />
         <Stack.Screen name="(buyer)/login" />
@@ -18,10 +16,9 @@ export default function RootLayout() {
         <Stack.Screen name="(farmer)/products/index" />
         <Stack.Screen name="(farmer)/products/add" />
         <Stack.Screen name="(farmer)/products/edit/[id]" />
-        <Stack.Screen name="(farmer)/sales" />
-        <Stack.Screen name="(farmer)/logout" />
+        {/* <Stack.Screen name="(farmer)/sales" /> */}
+        {/* <Stack.Screen name="(farmer)/logout" /> */}
         <Stack.Screen name="+not-found" />
       </Stack>
-    </AuthProvider>
   );
 }

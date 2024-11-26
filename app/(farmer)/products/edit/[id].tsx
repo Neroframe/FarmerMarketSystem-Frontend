@@ -1,5 +1,3 @@
-// app/farmer/products/edit/[id].tsx
-
 import React, { useEffect, useState } from 'react';
 import { 
   StyleSheet, 
@@ -27,7 +25,7 @@ interface Product {
   images: string[]; // URLs of images
 }
 
-const BASE_URL = 'https://farmermarketsystem-production.up.railway.app'; // Replace with your backend URL
+const BASE_URL = 'https://farmermarketsystem-production.up.railway.app'; 
 
 const EditProduct: React.FC = () => {
   const router = useRouter();
@@ -44,9 +42,6 @@ const EditProduct: React.FC = () => {
   const [isActive, setIsActive] = useState<boolean>(true);
   const [submitLoading, setSubmitLoading] = useState<boolean>(false);
 
-  /**
-   * Fetches the product details based on the ID.
-   */
   const fetchProduct = async () => {
     try {
       const response = await fetch(`${BASE_URL}/farmer/product/list-products`, {
@@ -81,15 +76,12 @@ const EditProduct: React.FC = () => {
     } catch (err: any) {
       console.error('Fetch Product Error:', err);
       Alert.alert('Error', err.message || 'Failed to fetch product details.');
-      router.replace('/(farmer)/products'); // Redirect to Products list on failure
+      router.replace('/(farmer)/products');
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * Handles the product update process.
-   */
   const handleUpdateProduct = async () => {
     if (submitLoading) return;
 
@@ -121,9 +113,7 @@ const EditProduct: React.FC = () => {
     try {
       const response = await fetch(`${BASE_URL}/farmer/product/edit-product`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', },
         credentials: 'include', // Include session cookie
         body: JSON.stringify({
           id: product?.id,

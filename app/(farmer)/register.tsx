@@ -1,5 +1,3 @@
-// app/farmer/Register.tsx
-
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -16,13 +14,9 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  /**
-   * Handles the registration process.
-   */
   const handleRegister = async () => {
     if (loading) return;
 
-    // Basic validation
     if (
       first_name.trim() === '' ||
       last_name.trim() === '' ||
@@ -45,7 +39,7 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/register', { // Replace with your backend URL
+      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +55,6 @@ const Register: React.FC = () => {
         }),
       });
 
-      // Handle HTTP errors
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Registration failed.');

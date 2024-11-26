@@ -7,8 +7,8 @@ const BuyerRegister: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
-  const [contactless, setContactless] = useState<string>(''); // String representation of boolean
-  const [preferredTime, setPreferredTime] = useState<string>(''); // Preferred time for delivery
+  const [contactless, setContactless] = useState<string>(''); // String boolean
+  const [preferredTime, setPreferredTime] = useState<string>(''); 
   const router = useRouter();
 
   const handleRegister = async () => {
