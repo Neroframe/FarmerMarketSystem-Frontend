@@ -1,3 +1,5 @@
+// app/farmer/product/[id].tsx
+
 import React, { useEffect, useState } from 'react';
 import { 
   StyleSheet, 
@@ -148,6 +150,42 @@ const EditProduct: React.FC = () => {
     }
   };
 
+  const handleDeleteProduct = async () => {
+    if (submitLoading) return;
+
+    setSubmitLoading(true);
+
+    try {
+      const response = await fetch(`${BASE_URL}/farmer/product/delete-product`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', },
+        credentials: 'include', // Include session cookie
+        body: JSON.stringify({
+          id: product?.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete product.');
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        Alert.alert('Success', 'Product deleted successfully!');
+        router.replace('/(farmer)/products'); // Redirect to Products list
+      } else {
+        throw new Error(data.message || 'Failed to delete product.');
+      }
+    } catch (error: any) {
+      console.error('Delete Product Error:', error);
+      Alert.alert('Error', error.message || 'An unexpected error occurred.');
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       fetchProduct();
@@ -256,6 +294,19 @@ const EditProduct: React.FC = () => {
         {submitLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Update Product</Text>}
       </TouchableOpacity>
 
+      {/* Delete Product Button */}
+      <TouchableOpacity
+        style={[styles.button, styles.deleteButton]}
+        onPress={handleDeleteProduct}
+        disabled={submitLoading}
+      >
+        {submitLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Delete Product</Text>
+        )}
+      </TouchableOpacity>
+
       {/* Back to Products Link */}
       <TouchableOpacity style={styles.backContainer} onPress={() => router.replace('/(farmer)/products')}>
         <Text style={styles.backText}>Back to Products</Text>
@@ -326,6 +377,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 10,
+  },
+  deleteButton: {
+    backgroundColor: '#f44336', // Red color for delete action
     marginTop: 10,
   },
   buttonText: {

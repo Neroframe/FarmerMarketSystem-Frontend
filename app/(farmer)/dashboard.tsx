@@ -3,6 +3,19 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert, ActivityIndicator } fr
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; 
 
+interface Product {
+  id: number;
+  farmer_id: number;
+  name: string;
+  category_id: number;
+  price: number;
+  quantity: number;
+  description: string;
+  is_active: boolean;
+  created_at: string; // ISO string
+  updated_at: string; // ISO string
+  images?: string[];
+}
 
 const Dashboard: React.FC = () => {
   const router = useRouter();
@@ -16,6 +29,10 @@ const Dashboard: React.FC = () => {
     farm_size: string;
     location: string;
     status: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    low_stock_products: Product[];
   } | null>(null);
 
   const fetchUserData = async () => {
@@ -27,12 +44,12 @@ const Dashboard: React.FC = () => {
         },
         credentials: 'include', // Include session cookie
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Session invalid or expired.');
       }
-
+  
       const data = await response.json();
       setUser(data);
     } catch (error: any) {
@@ -68,7 +85,11 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchUserData();
+    const interval = setInterval(() => {
+      fetchUserData();
+    }, 10000); // Fetch updates every 10 seconds
+  
+    return () => clearInterval(interval); // Clear interval on component unmount
   }, []);
 
   if (loading) {
@@ -99,26 +120,39 @@ const Dashboard: React.FC = () => {
           <Ionicons name="log-out-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-
-
+  
       <View style={styles.user}>
-        <Text style={styles.title}>Welcome, [{user.id}] {user.first_name} {user.last_name}!</Text>
+        <Text style={styles.title}>Welcome, {user.first_name} {user.last_name}!</Text>
         <Text style={styles.infoText}>Email: {user.email}</Text>
         <Text style={styles.infoText}>Farm Name: {user.farm_name}</Text>
         <Text style={styles.infoText}>Farm Size: {user.farm_size}</Text>
         <Text style={styles.infoText}>Location: {user.location}</Text>
         <Text style={styles.infoText}>Status: {user.status}</Text>
-
+  
+        {/* Low-stock Notifications */}
+        {user.low_stock_products && user.low_stock_products.length > 0 && (
+          <View style={styles.notificationContainer}>
+            <Text style={styles.notificationTitle}>Low Stock Alerts</Text>
+            {user.low_stock_products.map((product) => (
+              <View key={product.id} style={styles.notificationItem}>
+                <Text style={styles.notificationText}>
+                  Product "{product.name}" has low stock: {product.quantity} left.
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+  
         <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => router.push('/(farmer)/products')}
-        disabled={loading}
+          style={styles.button} 
+          onPress={() => router.push('/(farmer)/products')}
+          disabled={loading}
         >
-        <Text style={styles.buttonText}>View Products</Text>
+          <Text style={styles.buttonText}>View Products</Text>
         </TouchableOpacity>
       </View>
     </View>
-  );
+  );  
 };
 
 export default Dashboard;
@@ -197,4 +231,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  notificationContainer: {
+    marginTop: 30,
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  
+  notificationTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#f44336',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  
+  notificationItem: {
+    backgroundColor: '#ffebee',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  
+  notificationText: {
+    fontSize: 16,
+    color: '#d32f2f',
+  },
+  
 });

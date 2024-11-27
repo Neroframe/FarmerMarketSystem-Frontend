@@ -134,14 +134,16 @@ const ProductsList: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Products</Text>
-        <TouchableOpacity style={styles.addButton} onPress={navigateToAddProduct} disabled={loading}>
-        <Text style={styles.addButtonText}>+ Add Product</Text>
-        </TouchableOpacity>
+
         <TouchableOpacity onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
+      <TouchableOpacity style={styles.addButton} onPress={navigateToAddProduct} disabled={loading}>
+        <Text style={styles.addButtonText}>+ Add Product</Text>
+        </TouchableOpacity>
+        
       {/* Loading Indicator */}
       {loading && (
         <View style={styles.loadingContainer}>
