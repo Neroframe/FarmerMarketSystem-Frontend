@@ -24,12 +24,11 @@ const Login: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Include cookies in the request
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
-        Alert.alert('Failed', 'Login Failed!');
         const errorData = await response.json();
         throw new Error(errorData.message || 'Login failed.');
       }
@@ -38,9 +37,9 @@ const Login: React.FC = () => {
 
       if (data.success) {
         Alert.alert('Success', 'Login successful!');
-
         router.replace('/(farmer)/dashboard');
       } else {
+        Alert.alert( data.message);
         throw new Error(data.message || 'Login failed.');
       }
     } catch (error: any) {

@@ -13,8 +13,8 @@ import {
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 
-const CLOUDINARY_UPLOAD_PRESET = 'unsigned_preset'; // Ensure this matches your Cloudinary preset
-const CLOUDINARY_CLOUD_NAME = 'dvnezwrbt'; // Your Cloudinary cloud name
+const CLOUDINARY_UPLOAD_PRESET = 'unsigned_preset';
+const CLOUDINARY_CLOUD_NAME = 'dvnezwrbt'; 
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
 const BASE_URL = 'https://farmermarketsystem-production.up.railway.app'; 
 
@@ -136,7 +136,7 @@ const AddProduct: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Include session cookie if needed
+        credentials: 'include', 
         body: JSON.stringify({
           name,
           category_id: categoryIdNum,

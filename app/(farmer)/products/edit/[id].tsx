@@ -1,5 +1,3 @@
-// app/farmer/product/[id].tsx
-
 import React, { useEffect, useState } from 'react';
 import { 
   StyleSheet, 
@@ -87,7 +85,6 @@ const EditProduct: React.FC = () => {
   const handleUpdateProduct = async () => {
     if (submitLoading) return;
 
-    // Basic validation
     if (
       name.trim() === '' ||
       categoryId.trim() === '' ||
@@ -116,7 +113,7 @@ const EditProduct: React.FC = () => {
       const response = await fetch(`${BASE_URL}/farmer/product/edit-product`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', },
-        credentials: 'include', // Include session cookie
+        credentials: 'include',
         body: JSON.stringify({
           id: product?.id,
           name,
@@ -138,7 +135,7 @@ const EditProduct: React.FC = () => {
 
       if (data.success) {
         Alert.alert('Success', 'Product updated successfully!');
-        router.replace('/(farmer)/products'); // Redirect to Products list
+        router.replace('/(farmer)/products'); 
       } else {
         throw new Error(data.message || 'Failed to update product.');
       }
@@ -159,7 +156,7 @@ const EditProduct: React.FC = () => {
       const response = await fetch(`${BASE_URL}/farmer/product/delete-product`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', },
-        credentials: 'include', // Include session cookie
+        credentials: 'include', 
         body: JSON.stringify({
           id: product?.id,
         }),
@@ -174,7 +171,7 @@ const EditProduct: React.FC = () => {
 
       if (data.success) {
         Alert.alert('Success', 'Product deleted successfully!');
-        router.replace('/(farmer)/products'); // Redirect to Products list
+        router.replace('/(farmer)/products'); 
       } else {
         throw new Error(data.message || 'Failed to delete product.');
       }
