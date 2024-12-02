@@ -35,31 +35,37 @@ const Dashboard: React.FC = () => {
     low_stock_products: Product[];
   } | null>(null);
 
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/dashboard', { 
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('https://farmermarketsystem-production.up.railway.app/farmer/dashboard', { 
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
   
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Session invalid or expired.');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Session invalid or expired.');
+        }
+  
+        const data = await response.json();
+        setUser(data);
+      } catch (error: any) {
+        console.error('Dashboard Error:', error);
+        Alert.alert('Error', error.message || 'Failed to fetch user data.');
+        router.replace('/(farmer)/login'); // Redirect to Login on failure
+      } finally {
+        setLoading(false);
       }
+    };
   
-      const data = await response.json();
-      setUser(data);
-    } catch (error: any) {
-      console.error('Dashboard Error:', error);
-      Alert.alert('Error', error.message || 'Failed to fetch user data.');
-      router.replace('/(farmer)/login'); // Redirect to Login on failure
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Call the function to fetch user data
+    fetchUserData();
+  }, []);
+  
 
   const handleLogout = async () => {
     setLoading(true);
@@ -84,13 +90,13 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchUserData();
-    }, 10000); // Fetch updates every 10 seconds
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     fetchUserData();
+  //   }, 10000); // Fetch updates every 10 seconds
   
-    return () => clearInterval(interval); // Clear interval on component unmount
-  }, []);
+  //   return () => clearInterval(interval); // Clear interval on component unmount
+  // }, []);
 
   if (loading) {
     return (
