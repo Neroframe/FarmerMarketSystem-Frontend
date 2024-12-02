@@ -17,33 +17,28 @@ const BuyerLogin: React.FC = () => {
   
     try {
       const response = await fetch(`https://farmermarketsystem-production.up.railway.app/buyer/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
-      console.log("Response status:", response.status);
   
       if (!response.ok) {
-        let errorMessage = `Server error: ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          errorMessage = "response is not JSON"
-        }
-        throw new Error(errorMessage);
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed.');
       }
   
-      const result = await response.json();
-      console.log("Response body:", result);
-  
-      if (result.message === "Login successful") {
-        Alert.alert("Success", result.message);
-        router.push('/(buyer)/home');
+      const data = await response.json();
+
+      if (data.success) {
+        Alert.alert('Success', 'Login successful!');
+        router.replace('/(buyer)/home');
       } else {
-        Alert.alert("Error", result.message);
+        Alert.alert( data.message);
+        throw new Error(data.message || 'Login failed.');
       }
-      
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert("Error", error.message);

@@ -9,6 +9,10 @@ export default function RootLayout() {
         <Stack.Screen name="(buyer)/register" />
         <Stack.Screen name="(buyer)/home" />
         <Stack.Screen name="(buyer)/product/[id]" />
+        <Stack.Screen name="(buyer)/cart" />
+        <Stack.Screen name="(buyer)/checkout" />
+
+
 
         <Stack.Screen name="(farmer)/login" />
         <Stack.Screen name="(farmer)/register" />

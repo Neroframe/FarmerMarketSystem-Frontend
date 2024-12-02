@@ -1,3 +1,4 @@
+// home.tsx (BuyerHome.tsx)
 import React, { useEffect, useState } from 'react';
 import { 
   StyleSheet, 
@@ -25,8 +26,8 @@ type Product = {
   quantity: number;
   description: string;
   is_active: boolean;
-  created_at: string; // ISO date string
-  updated_at: string; // ISO date string
+  created_at: string;
+  updated_at: string;
   images: string[];
 };
 
@@ -56,14 +57,20 @@ const BuyerHome: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('https://farmermarketsystem-production.up.railway.app/buyer/home');
+        const response = await fetch('https://farmermarketsystem-production.up.railway.app/buyer/home', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
         if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.status}`);
-        }
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Session invalid or expired.');
+                }
 
         const data = await response.json();
 
-        // Map the data to adjust date fields if necessary
         const productsWithDates = data.map((product: any) => ({
           ...product,
           created_at: new Date(product.created_at).toISOString(),
@@ -83,11 +90,9 @@ const BuyerHome: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Effect to handle filtering, searching, and sorting
   useEffect(() => {
     let updatedProducts = [...products];
 
-    // Filter by category
     if (selectedCategory !== 'All') {
       updatedProducts = updatedProducts.filter((product) => {
         const categoryName = CATEGORY_MAP[product.category_id];
@@ -95,7 +100,6 @@ const BuyerHome: React.FC = () => {
       });
     }
 
-    // Search by name and category
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
       updatedProducts = updatedProducts.filter((product) => {
@@ -107,7 +111,6 @@ const BuyerHome: React.FC = () => {
       });
     }
 
-    // Sort products
     switch (selectedSort) {
       case 'price_asc':
         updatedProducts.sort((a, b) => a.price - b.price);
@@ -132,11 +135,29 @@ const BuyerHome: React.FC = () => {
     setFilteredProducts(updatedProducts);
   }, [products, selectedCategory, searchQuery, selectedSort]);
 
+  const handleAddToCart = async (product: Product) => {
+    try {
+      const response = await fetch('https://farmermarketsystem-production.up.railway.app/cart/add', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId: product.id, quantity: 1 }),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to add to cart: ${response.status}`);
+      }
+      Alert.alert('Success', `${product.name} has been added to your cart.`);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      Alert.alert('Error', 'Unable to add to cart. Please try again later.');
+    }
+  };
+
   const renderProduct = ({ item }: { item: Product }) => {
-    // Function to get the first valid image URL
     const getFirstImageUrl = (images: string[]): string | null => {
       if (!images || images.length === 0) return null;
-      // Return the first non-empty, trimmed URL
       for (let image of images) {
         const trimmedImage = image.trim();
         if (trimmedImage) {
@@ -167,7 +188,6 @@ const BuyerHome: React.FC = () => {
             style={styles.productImage}
             resizeMode="cover"
             onError={() => {
-              // Handle image load error by showing placeholder
               Alert.alert('Error', `Failed to load image for ${item.name}`);
             }}
           />
@@ -182,16 +202,27 @@ const BuyerHome: React.FC = () => {
           <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
           <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
           <Text style={styles.productCategory}>Category: {categoryName}</Text>
-          {/* TODO */}
-          {/* <Text style={styles.productLocation}>Location: {item.farmLocation}</Text> */}
+          <TouchableOpacity
+            style={styles.addToCartButton}
+            onPress={() => handleAddToCart(item)}
+            accessibilityLabel={`Add ${item.name} to cart`}
+            accessibilityRole="button"
+          >
+            <Ionicons name="cart-outline" size={20} color="#fff" />
+            <Text style={styles.addToCartButtonText}>Add to Cart</Text>
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     );
   };
 
   const handleLogout = () => {
-    // TODO
+    // Implement logout functionality
     router.push('/');
+  };
+
+  const handleNavigateToCart = () => {
+    router.replace('/(buyer)/cart');
   };
 
   return (
@@ -199,13 +230,23 @@ const BuyerHome: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Buyer Home</Text>
-        <TouchableOpacity 
-          onPress={handleLogout} 
-          accessibilityLabel="Logout" 
-          accessibilityRole="button"
-        >
-          <Ionicons name="log-out-outline" size={24} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.headerIcons}>
+          <TouchableOpacity 
+            onPress={handleNavigateToCart} 
+            style={styles.cartIconContainer}
+            accessibilityLabel="View Cart" 
+            accessibilityRole="button"
+          >
+            <Ionicons name="cart-outline" size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={handleLogout} 
+            accessibilityLabel="Logout" 
+            accessibilityRole="button"
+          >
+            <Ionicons name="log-out-outline" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Categories Filter */}
@@ -341,24 +382,30 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#4CAF50',
-    paddingTop: 50, // For status bar padding
+    paddingTop: 50,
     paddingBottom: 15,
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    // Shadow for iOS
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
-    // Elevation for Android
     elevation: 3,
   },
   headerTitle: {
     fontSize: 20,
     color: '#fff',
     fontWeight: 'bold',
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cartIconContainer: {
+    marginRight: 15,
+    position: 'relative',
   },
   filterContainer: {
     paddingHorizontal: 20,
@@ -499,17 +546,17 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     flexDirection: 'row',
     overflow: 'hidden',
-    // Shadow for iOS
+    padding: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    // Elevation for Android
     elevation: 3,
   },
   productImage: {
     width: 100,
     height: 100,
+    borderRadius: 10,
   },
   placeholderImage: {
     width: 100,
@@ -517,6 +564,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eaeaea',
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 10,
   },
   placeholderText: {
     marginTop: 5,
@@ -525,19 +573,17 @@ const styles = StyleSheet.create({
   },
   productInfo: {
     flex: 1,
-    padding: 15,
-    justifyContent: 'center',
+    paddingLeft: 10,
+    justifyContent: 'space-between',
   },
   productName: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 5,
   },
   productPrice: {
     fontSize: 16,
     color: '#4CAF50',
-    marginBottom: 5,
   },
   productQuantity: {
     fontSize: 14,
@@ -546,6 +592,21 @@ const styles = StyleSheet.create({
   productCategory: {
     fontSize: 14,
     color: '#555',
+  },
+  addToCartButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4CAF50',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  addToCartButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontSize: 14,
+    fontWeight: '500',
   },
   emptyContainer: {
     marginTop: 50,
